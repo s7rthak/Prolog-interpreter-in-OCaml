@@ -1,4 +1,4 @@
-# Prolog Interpreter in OCaml which does lazy evaluation
+# Prolog Interpreter in OCaml (lazy evaluation)
 
 This is a prolog interpreter that does lazy evaluation (finds solutions iff asked for) for a list of goals which is given as a query. There is also an eager version of evaluation which has been commented out in the source code where all satisfying solutions are outputted at once. The exception handling is not optimal as the purpose was to get a working model of the prolog interpreter for the assignment in the course COL226 (Programming Languages). Other instructions about the working of the interpreter are provided at runtime so we can call it an interactive interpreter. Exiting the interpreter is also very easy, type anything random. 
 
