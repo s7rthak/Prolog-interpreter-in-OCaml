@@ -16,8 +16,10 @@ let main () = begin
             try
                 print_string "?- ";
                 flush stdout;
-                let goal_list = Parser.repl Lexer.token lexbuf in 
-                let sol = solve program Sub.empty goal_list in 
+                let goal = Parser.repl Lexer.token lexbuf in 
+                let var_set = variableSet goal in 
+                (* let goal_list = findFactList program goal in  *)
+                let sol = solve program Sub.empty goal in 
                 let checker = ref sol in                                                                            (* The name checker is misleading. It basically is a LazyList of remaining solutions. *)
                 (* while (List.length !checker != 0) do
                     let print_sub v t = print_string((string_var v) ^ " = " ^ (string_term t) ^ "." ^ "\n") in Sub.iter print_sub (List.hd !checker); flush stdout; checker := List.tl !checker *)
@@ -32,7 +34,7 @@ let main () = begin
                     end
                 else
                     got := true;
-                    let print_sub v t = print_string((string_var v) ^ " = " ^ (string_term t) ^ "." ^ "\n") in Sub.iter print_sub (LL.hd !checker); 
+                    let print_sub v t = print_string((string_var v) ^ " = " ^ (string_term t) ^ "." ^ "\n") in Sub.iter print_sub (findNeededVar (LL.hd !checker) var_set); 
                     flush stdout; 
                     checker := LL.tl !checker; 
                     print_string "Press ; to continue or . for next query " ; 
@@ -47,7 +49,7 @@ let main () = begin
                             flag := ".";
                             flush stdout
                             end
-                        else let print_sub v t = print_string((string_var v) ^ " = " ^ (string_term t) ^ "." ^ "\n") in Sub.iter print_sub (LL.hd !checker); 
+                        else let print_sub v t = print_string((string_var v) ^ " = " ^ (string_term t) ^ "." ^ "\n") in Sub.iter print_sub (findNeededVar (LL.hd !checker) var_set); 
                         flush stdout; 
                         checker := LL.tl !checker; 
                         print_string "Press ; to continue or . for next query " ; 

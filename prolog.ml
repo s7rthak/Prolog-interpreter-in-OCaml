@@ -30,6 +30,13 @@ let body_clause c =
   | Fact h -> []
   | Rule (h,b) -> b
 
+let atofor_pred (x:atofor) = 
+  match x with 
+  | Atofor(p,l) -> p 
+
+let atofor_equal (x:atofor) (y:atofor) = ((atofor_pred x) = (atofor_pred y))
+
+
 let string_var v = match v with Variable(a) -> a                                                                    (* String of various types for output purpose. *)
 let rec string_term (t: term) = 
   match t with  
@@ -165,9 +172,9 @@ let rec solve (database: program) sub (goal_list: goal) =
 let rec solve_sh (database: clause list) q sub =                                                                    (* Here is the lazy version of the above algorithm using LazyLists where satisfying substitutions are found if needed. It supports backtracking and choice points. *)
   let pos = List.map (mgu_bool (atoform_to_term q)) (List.map head_of_clause_to_term database) in
     let zipped = List.combine pos database in
-        let rem = List.filter (fun e -> fst (fst e)) zipped in 
-          let clean = List.map (fun (x,y) -> (Sub.union rand sub (scd x),(body_clause y))) rem in 
-            back_tr database clean
+        let rem = List.map (fun e -> ((scd (fst e)),(scd e))) (List.filter (fun e -> fst (fst e)) zipped) in 
+          let clean = List.map (fun (x,y) -> let upsub = Sub.union rand sub x in (upsub,(List.map (sub_atofor upsub) (body_clause y)))) rem in 
+            print_int (List.length clean); print_newline ();back_tr database clean
 and back_tr (database: clause list) options =
   match options with 
   | [] -> LL.nil
@@ -176,11 +183,104 @@ and solve_dp (database: clause list) (sub,glist) =
   match glist with
   | [] -> LL.cons sub LL.nil
   | g::rest -> let psub = solve_sh database g sub in
-                let nopt = LL.map (fun e -> (e,rest)) psub in
+                let nopt = LL.map (fun e -> (e,(List.map (sub_atofor e) rest))) psub in
                   LL.concat (LL.map (solve_dp database) (nopt))
 let rec solve (database: program) sub (goal_list: goal) =
   match goal_list with 
   | [] -> raise (Unsolvable "goal-less")
-  | x::[] -> solve_sh database x sub
-  | x::y::rest -> let sol = solve_sh database x sub in 
+  | x::[] -> solve_dp database (sub,goal_list)
+  | x::y::rest -> let sol = solve_dp database (sub,goal_list) in 
                     LL.concat (LL.map (fun e -> solve database e (List.map (sub_atofor e) (List.tl goal_list))) sol)
+
+let rec search (database: program) (formula: atofor) =
+  match database with
+  | [] -> failwith "Not found"
+  | x::y -> 
+  (match x with 
+  | Fact(h) -> if atofor_equal h formula then x else (search y formula)
+  | Rule(h,b) -> if atofor_equal h formula then x else (search y formula)
+  )
+
+let rec findFactList (database: program) (goal: goal) =
+  List.concat (List.map (simplify database) goal)
+and simplify (database: program) (formula: atofor) =
+  let x = search database formula in
+    (match x with
+    | Fact(h) -> formula::[]
+    | Rule(h,b) -> findFactList database (List.map (sub_atofor (mgu (atoform_to_term h) (atoform_to_term formula))) b)
+    )
+
+let variableSet (goal: goal) = List.fold_left (Vset.union) Vset.empty (List.map var_set_atofor goal)
+
+let rec deepSearch sub v = 
+  match Sub.find v sub with
+  | C(c) -> C(c)
+  | V(v) -> deepSearch sub v
+  | _ -> raise (Error "unexpected")
+  
+let findNeededVar sub set =
+  let ans = ref Sub.empty in
+    Vset.iter (fun s -> ans := Sub.add s (deepSearch sub s) !ans; ()) set; !ans
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+
+
+
+
+(* and solve_dp sh_res database =
+  match sh_res with
+  | [] -> []
+  | h::t -> (solve database [] (List.map (sub_atofor (fst h)) (scd h))) @ solve_dp t database *)
+  (* let solve_shallow (database: program) sub (sat: atofor) =
+  let pos = List.map (mgu_bool sat) program in
+    let zipped = List.combine pos program 
+      let shallow = List.filter (fun e -> fst (fst e)) pos in
+        let rem = List.map (fun (x,y) -> (scd x,body_clause y)) shallow in
+          deep database rem sub
+and solve_deep database rem = 
+  let rest = List.map (fun e -> solve database (fst e) (List.map (sub_atofor (fst e)) (scd e)) rem in 
+    let left = List.filter (fun e -> List.length e > 0) rest in
+and solver goal = 
+  match goal_list with 
+  | *) 
+  
+  (* let aux database left_goals options = 
+    match options with
+    | [] -> raise (Unsolvable "unsat")
+    | h::t ->  *)

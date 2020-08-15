@@ -1,28 +1,2 @@
 ### Starting build.
-# Target: main.ml.depends, tags: { package(batteries), extension:ml, file:main.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package batteries -modules main.ml > main.ml.depends
-# Target: lexer.mll, tags: { package(batteries), extension:mll, file:lexer.mll, lexer, ocaml, ocamllex, quiet, traverse }
-ocamllex.opt -q lexer.mll
-# Target: lexer.ml.depends, tags: { package(batteries), extension:ml, file:lexer.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package batteries -modules lexer.ml > lexer.ml.depends
-# Target: parser.mly, tags: { package(batteries), extension:mly, file:parser.mly, infer, ocaml, ocamlyacc, parser, quiet, traverse }
-ocamlyacc parser.mly
-# Target: parser.mli.depends, tags: { package(batteries), extension:mli, file:parser.mli, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package batteries -modules parser.mli > parser.mli.depends
-# Target: prolog.ml.depends, tags: { package(batteries), extension:ml, file:prolog.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package batteries -modules prolog.ml > prolog.ml.depends
-# Target: prolog.cmo, tags: { package(batteries), byte, compile, extension:cmo, extension:ml, file:prolog.cmo, file:prolog.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package batteries -o prolog.cmo prolog.ml
-# Target: parser.cmi, tags: { package(batteries), byte, compile, extension:mli, file:parser.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package batteries -o parser.cmi parser.mli
-# Target: lexer.cmo, tags: { package(batteries), byte, compile, extension:cmo, extension:ml, file:lexer.cmo, file:lexer.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package batteries -o lexer.cmo lexer.ml
-# Target: main.cmo, tags: { package(batteries), byte, compile, extension:cmo, extension:ml, file:main.cmo, file:main.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package batteries -o main.cmo main.ml
-# Target: parser.ml.depends, tags: { package(batteries), extension:ml, file:parser.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -package batteries -modules parser.ml > parser.ml.depends
-# Target: parser.cmo, tags: { package(batteries), byte, compile, extension:cmo, extension:ml, file:parser.cmo, file:parser.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -package batteries -o parser.cmo parser.ml
-# Target: main.byte, tags: { package(batteries), byte, dont_link_with, extension:byte, file:main.byte, link, ocaml, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg -package batteries prolog.cmo parser.cmo lexer.cmo main.cmo -o main.byte
 # Compilation successful.
